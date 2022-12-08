@@ -12,7 +12,7 @@ import { Auth, Public } from '../decorators';
 import { AdminService } from './admin.service';
 import { CreateAdminDto, EditAdminDto } from './dto';
 
-// @Auth(Role.ADMIN)
+@Auth(Role.ADMIN)
 @Controller('admins')
 export class AdminController {
   constructor(private adminService: AdminService) {}
@@ -22,7 +22,7 @@ export class AdminController {
     return this.adminService.findAll();
   }
 
-  @Public()
+  // @Public()
   @Post()
   create(@Body() dto: CreateAdminDto) {
     return this.adminService.create(dto);
