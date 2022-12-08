@@ -1,0 +1,237 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email  String @unique
+  mobile String @unique
+  hash   String
+
+  avatar String? @unique
+
+  firstName String
+  lastName  String
+}
+
+model Moderator {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email  String @unique
+  mobile String @unique
+  hash   String
+
+  avatar String? @unique
+
+  firstName String
+  lastName  String
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email  String @unique
+  mobile String @unique
+  hash   String
+
+  avatar String? @unique
+
+  firstName String?
+  lastName  String?
+
+  store  Store?
+  dealer Dealer?
+}
+
+model Store {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  desc     String
+  image    String
+  isPublic Boolean @default(false)
+
+  owner   User @relation(fields: [ownerID], references: [id])
+  ownerID Int  @unique
+
+  banner String? @unique
+
+  products Product[]
+}
+
+model Dealer {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  desc     String
+  image    String
+  isPublic Boolean? @default(false)
+
+  dealer   User @relation(fields: [dealerID], references: [id])
+  dealerID Int  @unique
+
+  banner String? @unique
+
+  deals Deal[]
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name         String
+  price        String
+  desc         String
+  isAvailable  Boolean? @default(true)
+  isPublic     Boolean? @default(false)
+  isNegotiable Boolean? @default(false)
+  image        String[]
+
+  store   Store @relation(fields: [storeID], references: [id])
+  storeID Int
+
+  category   Category @relation(fields: [categoryID], references: [id])
+  categoryID Int
+
+  stock          Int?
+  original_price String?
+  advert         Advert?
+  Booking        Booking[]
+}
+
+model Deal {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name         String
+  price        String
+  desc         String
+  isAvailable  Boolean? @default(true)
+  isPublic     Boolean? @default(false)
+  isNegotiable Boolean? @default(false)
+  image        String[]
+
+  dealer   Dealer @relation(fields: [dealerID], references: [id])
+  dealerID Int
+
+  category   Category @relation(fields: [categoryID], references: [id])
+  categoryID Int
+
+  stock          Int?
+  original_price String?
+
+  rule     Rule?
+  rate     Rate[]
+  advert   Advert?
+  Booking  Booking[]
+  feedback Feedback[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+
+  deals    Deal[]
+  products Product[]
+}
+
+model Rule {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  rules String[]
+
+  deal   Deal @relation(fields: [dealID], references: [id])
+  dealID Int  @unique
+}
+
+model Rate {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rate Decimal
+
+  deal   Deal @relation(fields: [dealID], references: [id])
+  dealID Int
+
+  feedback Feedback?
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name String
+  feed String
+
+  deal   Deal  @relation(fields: [dealID], references: [id])
+  dealID Int
+  rate   Rate? @relation(fields: [rateID], references: [id])
+  rateID Int?  @unique
+}
+
+model Advert {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  start String
+  end   String
+
+  isRunning Boolean? @default(false)
+
+  banner String? @unique
+
+  product   Product? @relation(fields: [productID], references: [id])
+  productID Int?     @unique
+  deal      Deal?    @relation(fields: [dealID], references: [id])
+  dealID    Int?     @unique
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name    String
+  address Json
+  phone   String
+
+  payment_type String
+  amount       Decimal
+  isDelivered  Boolean? @default(false)
+
+  product   Product? @relation(fields: [productID], references: [id])
+  productID Int?
+
+  deal   Deal? @relation(fields: [dealID], references: [id])
+  dealID Int?
+}
