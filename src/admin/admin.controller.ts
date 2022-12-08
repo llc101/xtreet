@@ -12,7 +12,7 @@ import { Auth, Public } from '../decorators';
 import { AdminService } from './admin.service';
 import { CreateAdminDto, EditAdminDto } from './dto';
 
-@Auth(Role.ADMIN)
+// @Auth(Role.ADMIN)
 @Controller('admins')
 export class AdminController {
   constructor(private adminService: AdminService) {}
